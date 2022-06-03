@@ -12,18 +12,50 @@ const MealSchema = new Schema(
     },
     price: { type: Number, required: true },
     description: { type: String, required: true },
-    productType: {
+
+    productCatagory: {
       type: String,
-      enum: ["Used", "New", "Slightly Used"],
-      require: [true, "Product Type is required"],
+      enum: [
+        "Home-Appliance",
+        "Vehicles",
+        "Electronics",
+        "Clothing",
+        "Home-Furniture",
+        "Gym-Equipment",
+      ],
     },
-    productCatagory: { type: String, enum: ["HomeAppliance", "Cars", "Other"] },
-    productDeadline: { type: Date, required: [true, "Deadline has to be set"] },
+    createdAt: { type: Date },
     image: String,
     owner: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
       required: [true, "A product must have owner"],
+    },
+    status: { type: String, enum: ["New", "Used"] },
+    specs: {
+      fuel: { type: String },
+      specType: { type: String },
+      transmission: { type: String },
+      milage: { type: Number },
+      make: { type: String },
+      engineSize: { type: Number, default: 1000 },
+      Gender: { type: String },
+      phoneStorage: { type: Number },
+      phoneRam: { type: Number },
+      phoneBrand: { type: String },
+      phoneModel: { type: String },
+      phoneCamera: { type: Number },
+      tvScreenSize: { type: String },
+      tvResolution: { type: String },
+      tvBrand: { type: String },
+      tvModel: { type: String },
+      ElectronicType: { type: String },
+      laptopModel: { type: String },
+      laptopStorage: { type: String },
+      laptopRam: { type: Number },
+      laptopScreenSize: { type: String },
+      laptopProcessor: { type: String },
+      laptopBrand: { type: String },
     },
   },
   {
@@ -31,6 +63,9 @@ const MealSchema = new Schema(
     toObject: { virtuals: true },
   }
 );
+MealSchema.index({ name: "text", description: "text" });
+MealSchema.index({ price: -1 });
+MealSchema.index({ productCatagory: -1 });
 
 MealSchema.virtual("bids", {
   ref: "Bids",
@@ -39,7 +74,7 @@ MealSchema.virtual("bids", {
 });
 
 MealSchema.pre(/^find/, function (next) {
-  this.populate({ path: "owner", select: "userName" });
+  this.populate({ path: "owner", select: "userName _id" });
   next();
 });
 

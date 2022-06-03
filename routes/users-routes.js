@@ -3,6 +3,7 @@ const userControllers = require("../controllers/usersControllers");
 const Auth = require("../auth/AuthController");
 const { check } = require("express-validator");
 const fileUpload = require("../utils/fileUpload");
+const productController = require("../controllers/placesControllers");
 
 const router = express.Router();
 
@@ -17,10 +18,13 @@ router.post(
 );
 
 router.post("/login", userControllers.loginUser);
+router.post("/getChats", userControllers.getChats);
+router.post("/getChat", Auth.protect, userControllers.getMessage);
 router.patch("/forgotPassword", Auth.forgotPassword);
 router.patch("/resetPassword/:token", Auth.resetPassword);
 router.patch("/updatePassword", Auth.protect, Auth.updatePassword);
 router.patch("/updateData", Auth.protect, userControllers.updateData);
+router.post("/sendMessage", Auth.protect, userControllers.sendMessage);
 router.delete("/deleteMe", Auth.protect, userControllers.deleteMe);
 router.delete(
   "/:pid",

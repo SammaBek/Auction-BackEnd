@@ -1,10 +1,13 @@
 const bcrypt = require("bcrypt");
 const HttepError = require("../models/http-error");
 const jwt = require("jsonwebtoken");
-
+const express = require("express");
+const { savedToDB, sendMsg } = require("../utils/socket");
 const { validationResult } = require("express-validator");
 const User = require("../models/users");
 const { findById } = require("../models/users");
+const Email = require("../utils/sendEmail");
+const Chats = require("../models/Chats");
 
 const createUser = async (req, res, next) => {
   const { userName, password, email, passwordChangedAt, role } = req.body;
@@ -31,6 +34,7 @@ const createUser = async (req, res, next) => {
     email,
     role,
     image: req.file.path,
+    createdAt: Date.now(),
   });
 
   let token;
@@ -41,6 +45,9 @@ const createUser = async (req, res, next) => {
       { expiresIn: "1h" }
     );
   } catch {}
+  const url = `${req.protocol}://${req.get("host")}`;
+  await new Email(newUser, url).sendWelcome();
+
   newUser.password = undefined;
 
   res.status(201).json({ token: token, theUser: newUser });
@@ -91,6 +98,9 @@ const loginUser = async (req, res, next) => {
     secure: true,
   });
   theUser.password = undefined;
+
+  savedToDB("New log in");
+
   res.status(200).json({
     token: token,
 
@@ -201,9 +211,124 @@ const deleteMe = async (req, res, next) => {
   res.status(204).json({ message: "Deleted" });
 };
 
+const sendMessage = async (req, res, next) => {
+  const { users, message, sender, image } = req.body;
+  const Chat = new Chats({
+    users,
+    message,
+    sender,
+    createdAt: Date.now(),
+    image,
+    participants: users,
+  });
+
+  try {
+    await Chat.save();
+  } catch (err) {
+    return next(new HttepError("Couldnt save the message", 500));
+  }
+  sendMsg(Chat);
+  res.status(201).json({ Chat: Chat.toJSON({ getters: true }) });
+};
+
+const getMessage = async (req, res, next) => {
+  console.log("this is body", req.body);
+  const { user1, user2 } = req.body;
+  let chat;
+  try {
+    chat = await Chats.find({ participants: { $all: [user1, user2] } })
+      .populate({ path: "users", select: "userName" })
+      .populate({ path: "sender", select: "image" })
+      .sort({ createdAt: -1 })
+      .limit(10);
+  } catch (err) {
+    return next(new HttepError("Couldnt find the chat", 500));
+  }
+  console.log(chat);
+  res.status(200).json({ chat });
+};
+
+const getChats = async (req, res, next) => {
+  let chats;
+  let myUser = req.body.myUser;
+  console.log("this is ID", myUser);
+  try {
+    chats = await Chats.aggregate([
+      {
+        $match: {
+          participants: {
+            $in: [myUser],
+          },
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: "$participants",
+          message: { $first: "$message" },
+          createdAt: { $first: "$createdAt" },
+          image: { $first: "$image" },
+          participants: { $first: "$participants" },
+          sender: { $first: "$sender" },
+          seen: { $first: "$seen" },
+        },
+      },
+      { $sort: { createdAt: 1 } },
+    ]);
+  } catch (err) {
+    return next(new HttepError("Couldnt find the chat", 500));
+  }
+
+  console.log(chats);
+  let arr = [];
+  let val, Usr;
+
+  for (let i = 0; i < chats.length; i++) {
+    let arrUnique = [];
+    for (let j = i + 1; j < chats.length; j++) {
+      let c = 0;
+      for (let k = 0; k < 2; k++) {
+        for (let l = 0; l < 2; l++) {
+          if (chats[i]._id[k] === chats[j]._id[l]) {
+            // console.log(`${chats[i]._id[k]} and  ${chats[j]._id[l]}`);
+            c++;
+          }
+        }
+      }
+      arrUnique.push(c);
+    }
+    let obj;
+    if (!arrUnique.includes(2)) {
+      for (let m = 0; m < 2; m++) {
+        if (chats[i].participants[m] !== myUser) {
+          Usr = await User.findById(chats[i].participants[m]);
+          obj = {
+            message: chats[i].message,
+            _id: chats[i].message,
+            image: Usr.image,
+            participants: chats[i].participants,
+            sender: chats[i].sender,
+            name: Usr.userName,
+          };
+          console.log(obj);
+        }
+      }
+
+      arr.push(obj);
+    }
+  }
+
+  arr.reverse();
+
+  res.status(200).json({ arr });
+};
+
 exports.createUser = createUser;
 exports.loginUser = loginUser;
 exports.deleteUser = deleteUser;
 exports.getUser = getUser;
 exports.updateData = updateData;
 exports.deleteMe = deleteMe;
+exports.sendMessage = sendMessage;
+exports.getMessage = getMessage;
+exports.getChats = getChats;

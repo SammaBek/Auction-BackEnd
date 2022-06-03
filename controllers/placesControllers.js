@@ -1,7 +1,11 @@
 const HttepError = require("../models/http-error");
 const Meals = require("../models/Meals");
 const Bids = require("../models/Bids");
+const Chats = require("../models/Chats");
 const { validationResult } = require("express-validator");
+const { newBid, newNotification } = require("../utils/socket");
+const Notification = require("../models/Notifications");
+const { match } = require("assert");
 
 const getMealById = async (req, res, next) => {
   const id = req.params.id;
@@ -52,6 +56,90 @@ const getMealByUserId = async (req, res, next) => {
   res.json({ meal: meal });
 };
 
+const getByName = async (req, res, next) => {
+  const name = req.params.search;
+
+  console.log("this is name of product", name);
+
+  let meals, meal;
+
+  try {
+    meal = await Meals.find({ $text: { $search: name } }).populate("bids");
+  } catch {
+    return next(new HttepError("Couldnt Find The Product"));
+  }
+
+  if (!meal || meal.length === 0) {
+    res.status(200);
+    res.json({ meal: [] });
+  } else {
+    res.status(200);
+    res.json({ meal: meal });
+  }
+};
+
+const filterProduct = async (req, res, next) => {
+  console.log(req.query);
+
+  const obj = {};
+  const objF = {};
+
+  const k = Object.keys(req.query);
+
+  k.map((key) => {
+    if (
+      key === "price" ||
+      key === "specs.milage" ||
+      key == "specs.engineSize"
+    ) {
+      obj[key] = JSON.parse(req.query[key]);
+    } else {
+      obj[key] = req.query[key];
+    }
+  });
+
+  // const strQuery = JSON.stringify(req.query);
+
+  // const strF = strQuery.replace(/\b(gte|lte)\b/g, (match) => `$${match}`);
+
+  // const Query = JSON.parse(strF);
+  // console.log(Query);
+
+  console.log(obj);
+
+  let products;
+
+  try {
+    products = await Meals.find(obj);
+  } catch (err) {
+    return next(
+      new HttepError("Couldnt Find The product with this Filter Object")
+    );
+  }
+
+  res.status(200).json({ products });
+};
+
+const getProduct = async (req, res, next) => {
+  const id = req.params.id;
+
+  let meals, meal;
+
+  try {
+    meal = await Meals.findById({ price: req.body.price })
+      .explain()
+      .populate("bids");
+  } catch {
+    return next(new HttepError("Couldnt Find The meal with this User"));
+  }
+
+  if (!meal || meal.length === 0) {
+    return next(new HttepError("User Id provided Couldnt be found", 404));
+  }
+  res.json(200);
+  res.json({ meal: meal });
+};
+
 const createMeal = async (req, res, next) => {
   const error = validationResult(req);
 
@@ -63,20 +151,25 @@ const createMeal = async (req, res, next) => {
     price,
     name,
     description,
-    productType,
+
     productCatagory,
-    productDeadline,
+    status,
+
+    ...specs
   } = req.body;
   console.log(req.body);
   const newMeal = new Meals({
     name,
     price,
     description,
-    productType,
+
     productCatagory,
-    productDeadline: new Date(productDeadline),
+    status,
+
     image: req.file.path,
     owner: req.user._id,
+    createdAt: Date.now(),
+    specs,
   });
 
   console.log(newMeal);
@@ -119,22 +212,57 @@ const deleteMeal = async (req, res, next) => {
 };
 
 const bid = async (req, res, next) => {
-  const { name, email, price, product, prodImage } = req.body;
+  const { name, email, price, product, prodImage, ownerId } = req.body;
   console.log(req);
-  let Bid;
+  let Bid, Notf;
   console.log(name, email, price, product, prodImage);
-  Bid = new Bids({ name, email, price, product, image: prodImage });
+  Bid = new Bids({
+    name,
+    email,
+    price,
+    product,
+    image: prodImage,
+    bidderId: req.user.id,
+  });
 
   try {
     await Bid.save();
   } catch {
     return next(new HttepError("Couldnt save the bid", 500));
   }
+  newBid(Bid, ownerId);
 
-  res.status(200).json({ bid });
+  Notf = new Notification({
+    sender: req.user.id,
+    receiver: ownerId,
+    product: product,
+    message: `${req.user.userName} has made a bid on your product`,
+    to: "bids",
+  });
+
+  console.log(Notf);
+
+  try {
+    await Notf.save();
+  } catch (err) {
+    return next(new HttepError("Couldnt save notification", 500));
+  }
+  newNotification(Notf, ownerId);
+
+  res.status(200).json({ Bid });
 };
 
-const getBid = async (req, res, next) => {};
+const getNotification = async (req, res, next) => {
+  const id = req.params.id;
+  let notifications;
+  try {
+    notifications = await Notification.find({ receiver: id });
+  } catch (err) {
+    return next(new HttepError("Couldnt find notifications", 500));
+  }
+
+  res.status(200).json({ notifications });
+};
 
 exports.getMealById = getMealById;
 exports.getMealByUserId = getMealByUserId;
@@ -143,4 +271,7 @@ exports.updateMeal = updateMeal;
 exports.deleteMeal = deleteMeal;
 exports.getMeal = getMeal;
 exports.makeBid = bid;
-exports.getBid = getBid;
+exports.getNotf = getNotification;
+exports.getProduct = getProduct;
+exports.getProductByName = getByName;
+exports.filterProduct = filterProduct;

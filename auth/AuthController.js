@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/users");
 const SendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
+const Email = require("../utils/sendEmail");
 
 exports.protect = async (req, res, next) => {
   let token;
@@ -88,17 +89,10 @@ exports.forgotPassword = async (req, res, next) => {
 
   //3) send the generated token to the email address
 
-  const ResetURL = `${req.protocol}://${req.get(
-    "host"
-  )}/api/users/forgotPassword/${randomToken}`;
+  const ResetURL = `${req.protocol}://localhost:3000/newpassword/${randomToken}`;
 
-  const message = `here is your token to reset your password:${ResetURL}`;
   try {
-    await SendEmail({
-      email: req.body.email,
-      message,
-      subject: "Password Reset Token",
-    });
+    await new Email(theUser, ResetURL).SendPassForget();
 
     res
       .status(200)
@@ -157,7 +151,7 @@ exports.resetPassword = async (req, res, next) => {
     });
   } catch {}
 
-  res.status(201).json({ token: token });
+  res.status(201).json({ token: token, user: theUser });
 };
 
 exports.updatePassword = async (req, res, next) => {

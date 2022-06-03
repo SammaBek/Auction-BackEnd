@@ -7,6 +7,10 @@ const BidSchema = new Schema(
     name: { type: String, required: [true, "A bidder has to have name"] },
     price: { type: Number, required: [true, "A bid has to have a price"] },
     email: { type: String, required: [true, "A bidder has to have an email"] },
+    bidderId: {
+      type: String,
+      required: [true, "A bidder has to have an email"],
+    },
     product: {
       type: mongoose.Schema.ObjectId,
       required: [true, "A bid has to have a product"],

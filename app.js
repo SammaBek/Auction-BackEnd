@@ -7,7 +7,22 @@ const bodyParser = require("body-parser");
 const mealsRoutes = require("./routes/routes-meals");
 const HttepError = require("./models/http-error");
 const userRoutes = require("./routes/users-routes");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const { start } = require("./utils/socket");
+
+const dotenv = require("dotenv");
+dotenv.config({ path: "./config.env" });
 const app = express();
+const httpServer = createServer(app);
+
+console.log(process.env.EMAIL_FROM);
+const io = new Server(httpServer, {
+  cors: {
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+  },
+});
+
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
@@ -21,6 +36,8 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
   next();
 });
+
+start(io);
 
 app.use("/api/meals", mealsRoutes);
 app.use("/api/users", userRoutes);
@@ -57,7 +74,9 @@ mongoose
     "mongodb+srv://SammaBek2021:SammaBek2021@cluster0.ny4xp.mongodb.net/MealApp?retryWrites=true&w=majority"
   )
   .then(() => {
-    app.listen(8000);
+    httpServer.listen(8000, () => {
+      console.log("Server is listening on Port 8000");
+    });
     console.log("DataBase Connected");
   })
   .catch((err) => console.log(err));

@@ -8,12 +8,18 @@ const fileUpload = require("../utils/fileUpload");
 const router = express.Router();
 
 router.get("/", Auth.protect, mealControllers.getMeal);
-
+router.get(
+  "/getByName/:search",
+  Auth.protect,
+  mealControllers.getProductByName
+);
+router.get("/filterProducts/", mealControllers.filterProduct);
 router.get("/:id", Auth.protect, mealControllers.getMealById);
 
 router.get("/user/:id", mealControllers.getMealByUserId);
 router.post("/makebid", Auth.protect, mealControllers.makeBid);
-router.get("/getBid", Auth.protect, mealControllers.getBid);
+
+router.get("/getnotification/:id", Auth.protect, mealControllers.getNotf);
 
 router.post(
   "/addproduct",

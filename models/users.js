@@ -19,6 +19,7 @@ const userSchema = new Schema(
     role: { type: String, enum: ["admin", "user"], default: "user" },
     PasswordResetToken: String,
     passwordResetExpires: Date,
+    createdAt: { type: Date },
     active: {
       type: Boolean,
       default: true,
@@ -31,7 +32,6 @@ const userSchema = new Schema(
     toObject: { virtuals: true },
   }
 );
-
 userSchema.virtual("products", {
   ref: "Meals",
   foreignField: "owner",

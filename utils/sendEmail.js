@@ -1,26 +1,59 @@
 const nodemailer = require("nodemailer");
+const pug = require("pug");
+const HtmlToText = require("html-to-text");
 
-const SendEmail = async (options) => {
-  //1) Create Transporter
-  const transporter = nodemailer.createTransport({
-    host: "smtp.mailtrap.io",
-    port: 2525,
-    auth: {
-      user: "203d9133675237",
-      pass: "f10b2db0c720c0",
-    },
-  });
+module.exports = class Email {
+  constructor(user, url) {
+    this.to = user.email;
+    this.firstName = user.userName.split(" ")[0];
+    this.url = url;
+    this.from = `Samuel Bekele <${process.env.EMAIL_FROM}>`;
+  }
+  newTransport() {
+    if (process.env.NODE_ENV === "production") {
+      console.log("production Baby");
+      console.log(process.env);
+      return nodemailer.createTransport({
+        service: "SendGrid",
+        auth: {
+          user: process.env.SENDGRID_USERNAME,
+          pass: process.env.SENDGRID_PASSWORD,
+        },
+      });
+    }
+    return nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+  }
 
-  //2) define options for email
+  async send(template, subject) {
+    const html = pug.renderFile(`${__dirname}/../view/${template}.pug`, {
+      firstName: this.firstName,
+      subject,
+      url: this.url,
+    });
 
-  const mailOptions = {
-    from: "Samuel Bekele <sammabek@test.com>",
-    to: options.email,
-    subject: options.subject,
-    text: options.message,
-  };
+    const mailOptions = {
+      from: `Samuel Bekele <${process.env.EMAIL_FROM}>`,
+      to: this.to,
+      subject,
+      html,
+      text: HtmlToText.fromString(html),
+    };
 
-  //3) send the Email
-  transporter.sendMail(mailOptions);
+    await this.newTransport().sendMail(mailOptions);
+  }
+
+  async sendWelcome() {
+    await this.send("welcomeEMail", "Welcome to Gabaa Auction");
+  }
+
+  async SendPassForget() {
+    await this.send("forgetPassEmail", "Change Your Password");
+  }
 };
-module.exports = SendEmail;
