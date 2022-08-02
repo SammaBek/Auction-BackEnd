@@ -38,7 +38,7 @@ const MealSchema = new Schema(
       transmission: { type: String },
       milage: { type: Number },
       make: { type: String },
-      engineSize: { type: Number, default: 1000 },
+      engineSize: { type: Number },
       Gender: { type: String },
       phoneStorage: { type: Number },
       phoneRam: { type: Number },
@@ -74,7 +74,7 @@ MealSchema.virtual("bids", {
 });
 
 MealSchema.pre(/^find/, function (next) {
-  this.populate({ path: "owner", select: "userName _id" });
+  this.populate({ path: "owner", select: "userName _id image" });
   next();
 });
 

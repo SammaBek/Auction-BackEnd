@@ -10,7 +10,8 @@ const Email = require("../utils/sendEmail");
 const Chats = require("../models/Chats");
 
 const createUser = async (req, res, next) => {
-  const { userName, password, email, passwordChangedAt, role } = req.body;
+  const { userName, password, email, passwordChangedAt, role, phone } =
+    req.body;
   let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
@@ -32,6 +33,7 @@ const createUser = async (req, res, next) => {
     userName,
     password,
     email,
+    phone,
     role,
     image: req.file.path,
     createdAt: Date.now(),
@@ -240,11 +242,28 @@ const getMessage = async (req, res, next) => {
       .populate({ path: "users", select: "userName" })
       .populate({ path: "sender", select: "image" })
       .sort({ createdAt: -1 })
-      .limit(10);
+      .limit(20);
   } catch (err) {
     return next(new HttepError("Couldnt find the chat", 500));
   }
-  console.log(chat);
+  console.log(JSON.stringify(chat[0]._id));
+  let id = JSON.stringify(chat[0]._id);
+
+  id = id.slice(1, id.length - 1);
+
+  console.log(`this is the message id ${id}`);
+
+  let ch;
+
+  if (chat[0].seen === false) {
+    console.log("in the if close");
+    try {
+      await Chats.findByIdAndUpdate(id, { seen: true });
+    } catch (err) {
+      return next(new HttepError("Couldnt carry on Operation", 500));
+    }
+  }
+
   res.status(200).json({ chat });
 };
 
@@ -289,7 +308,7 @@ const getChats = async (req, res, next) => {
       let c = 0;
       for (let k = 0; k < 2; k++) {
         for (let l = 0; l < 2; l++) {
-          if (chats[i]._id[k] === chats[j]._id[l]) {
+          if (chats[i].participants[k] === chats[j].participants[l]) {
             // console.log(`${chats[i]._id[k]} and  ${chats[j]._id[l]}`);
             c++;
           }
@@ -301,15 +320,20 @@ const getChats = async (req, res, next) => {
     if (!arrUnique.includes(2)) {
       for (let m = 0; m < 2; m++) {
         if (chats[i].participants[m] !== myUser) {
+          console.log(` participant ${chats[i].participants[m]}`);
           Usr = await User.findById(chats[i].participants[m]);
-          obj = {
-            message: chats[i].message,
-            _id: chats[i].message,
-            image: Usr.image,
-            participants: chats[i].participants,
-            sender: chats[i].sender,
-            name: Usr.userName,
-          };
+          if (Usr) {
+            obj = {
+              message: chats[i].message,
+              _id: chats[i].message,
+              image: Usr.image,
+              participants: chats[i].participants,
+              sender: chats[i].sender,
+              name: Usr.userName,
+              seen: chats[i].seen,
+            };
+          }
+
           console.log(obj);
         }
       }
@@ -319,8 +343,20 @@ const getChats = async (req, res, next) => {
   }
 
   arr.reverse();
-
-  res.status(200).json({ arr });
+  let count = 0;
+  console.log(req.body.number);
+  if (req.body.number === 0) {
+    console.log(arr[0]);
+    arr.map((ch) => {
+      if (ch.seen === false) {
+        console.log("Count");
+        count++;
+      }
+    });
+    res.status(200).json({ num: count });
+  } else {
+    res.status(200).json({ arr });
+  }
 };
 
 exports.createUser = createUser;

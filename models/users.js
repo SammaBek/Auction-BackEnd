@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const uniqueValidator = require("mongoose-unique-validator");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
+const { Double } = require("mongodb");
 
 const Schema = mongoose.Schema;
 
@@ -20,6 +21,7 @@ const userSchema = new Schema(
     PasswordResetToken: String,
     passwordResetExpires: Date,
     createdAt: { type: Date },
+    phone: { type: Number },
     active: {
       type: Boolean,
       default: true,

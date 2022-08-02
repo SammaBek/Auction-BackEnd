@@ -6,12 +6,13 @@ const { validationResult } = require("express-validator");
 const { newBid, newNotification } = require("../utils/socket");
 const Notification = require("../models/Notifications");
 const { match } = require("assert");
+const Users = require("../models/users");
 
 const getMealById = async (req, res, next) => {
   const id = req.params.id;
   let meal;
   try {
-    meal = await Meals.findById(id).populate("bids");
+    meal = await Meals.findById(id);
   } catch {
     return next(new HttepError("Couldnt Find The Meal you searched", 500));
   }
@@ -41,19 +42,20 @@ const getMeal = async (req, res, next) => {
 const getMealByUserId = async (req, res, next) => {
   const id = req.params.id;
 
-  let meals, meal;
+  console.log(`this is ID:${id}`);
+
+  let meals, user;
 
   try {
-    meal = await Meals.findById(req.params.id).populate("bids");
+    user = await Users.findById(id).populate("products");
   } catch {
     return next(new HttepError("Couldnt Find The meal with this User"));
   }
 
-  if (!meal || meal.length === 0) {
+  if (!user) {
     return next(new HttepError("User Id provided Couldnt be found", 404));
   }
-  res.json(200);
-  res.json({ meal: meal });
+  res.status(200).json({ user: user });
 };
 
 const getByName = async (req, res, next) => {
@@ -186,6 +188,7 @@ const createMeal = async (req, res, next) => {
 
 const updateMeal = async (req, res, next) => {
   const { price, name } = req.body;
+  console.log(req.body);
   let updatedMeal;
   try {
     updatedMeal = await Meals.findByIdAndUpdate(req.params.pid, req.body, {
@@ -264,7 +267,16 @@ const getNotification = async (req, res, next) => {
   res.status(200).json({ notifications });
 };
 
+const editProduct = async (req, res, next) => {
+  const obj = { ...req.body };
+
+  console.log(obj);
+
+  res.status(200).json({ obj });
+};
+
 exports.getMealById = getMealById;
+exports.editProduct = editProduct;
 exports.getMealByUserId = getMealByUserId;
 exports.createMeal = createMeal;
 exports.updateMeal = updateMeal;

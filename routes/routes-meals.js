@@ -13,10 +13,11 @@ router.get(
   Auth.protect,
   mealControllers.getProductByName
 );
+
 router.get("/filterProducts/", mealControllers.filterProduct);
 router.get("/:id", Auth.protect, mealControllers.getMealById);
 
-router.get("/user/:id", mealControllers.getMealByUserId);
+router.get("/myproducts/:id", mealControllers.getMealByUserId);
 router.post("/makebid", Auth.protect, mealControllers.makeBid);
 
 router.get("/getnotification/:id", Auth.protect, mealControllers.getNotf);
