@@ -27,7 +27,7 @@ const getMealById = async (req, res, next) => {
 const getMeal = async (req, res, next) => {
   let meal;
   try {
-    meal = await Meals.find().populate("bids");
+    meal = await Meals.find();
   } catch {
     return next(new HttepError("Couldnt Find ANY Meal ", 500));
   }

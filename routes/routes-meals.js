@@ -7,7 +7,7 @@ const fileUpload = require("../utils/fileUpload");
 
 const router = express.Router();
 
-router.get("/", Auth.protect, mealControllers.getMeal);
+router.get("/", mealControllers.getMeal);
 router.get(
   "/getByName/:search",
   Auth.protect,

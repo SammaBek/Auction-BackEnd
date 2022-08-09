@@ -48,11 +48,16 @@ module.exports = {
     }
   },
 
-  newNotification: function (data, receiver) {
-    console.log(receiver);
-    if (clients[receiver]) {
-      clients[receiver].emit("newNotification", data);
-    }
+  newNotification: function (chat) {
+    chat.participants.map((p) => {
+      if (chat.sender !== p) {
+        console.log("message sent");
+        console.log("reveiver", p);
+        if (clients[p]) {
+          clients[p].emit("newNotification");
+        }
+      }
+    });
   },
   sendMsg: function (chat) {
     console.log(chat);

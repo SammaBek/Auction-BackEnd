@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const HttepError = require("../models/http-error");
 const jwt = require("jsonwebtoken");
 const express = require("express");
-const { savedToDB, sendMsg } = require("../utils/socket");
+const { savedToDB, sendMsg, newNotification } = require("../utils/socket");
 const { validationResult } = require("express-validator");
 const User = require("../models/users");
 const { findById } = require("../models/users");
@@ -230,6 +230,7 @@ const sendMessage = async (req, res, next) => {
     return next(new HttepError("Couldnt save the message", 500));
   }
   sendMsg(Chat);
+  newNotification(Chat);
   res.status(201).json({ Chat: Chat.toJSON({ getters: true }) });
 };
 
@@ -246,21 +247,24 @@ const getMessage = async (req, res, next) => {
   } catch (err) {
     return next(new HttepError("Couldnt find the chat", 500));
   }
-  console.log(JSON.stringify(chat[0]._id));
-  let id = JSON.stringify(chat[0]._id);
 
-  id = id.slice(1, id.length - 1);
+  if (chat.length > 0) {
+    console.log(JSON.stringify(chat[0]._id));
+    let id = JSON.stringify(chat[0]._id);
 
-  console.log(`this is the message id ${id}`);
+    id = id.slice(1, id.length - 1);
 
-  let ch;
+    console.log(`this is the message id ${id}`);
 
-  if (chat[0].seen === false) {
-    console.log("in the if close");
-    try {
-      await Chats.findByIdAndUpdate(id, { seen: true });
-    } catch (err) {
-      return next(new HttepError("Couldnt carry on Operation", 500));
+    let ch;
+
+    if (chat[0].seen === false) {
+      console.log("in the if close");
+      try {
+        await Chats.findByIdAndUpdate(id, { seen: true });
+      } catch (err) {
+        return next(new HttepError("Couldnt carry on Operation", 500));
+      }
     }
   }
 
