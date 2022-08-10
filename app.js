@@ -11,8 +11,8 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const { start } = require("./utils/socket");
 
-const dotenv = require("dotenv");
-dotenv.config({ path: "./config.env" });
+// const dotenv = require("dotenv");
+// dotenv.config({ path: "./config.env" });
 const app = express();
 const httpServer = createServer(app);
 
@@ -71,10 +71,10 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    "mongodb+srv://SammaBek2021:SammaBek2021@cluster0.ny4xp.mongodb.net/MealApp?retryWrites=true&w=majority"
+    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.ny4xp.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
   )
   .then(() => {
-    httpServer.listen(8000, () => {
+    httpServer.listen(process.env.PORT || 8000, () => {
       console.log("Server is listening on Port 8000");
     });
     console.log("DataBase Connected");
