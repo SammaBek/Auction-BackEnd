@@ -1,7 +1,6 @@
 {
   "env": {
     "DB_USER": "SammaBek2021",
-    "PORT": 8000,
     "DB_PASSWORD": "SammaBek2021",
     "DB_NAME": "MealApp",
     "EMAIL_FROM": "sammabek2020@gmail.com",
