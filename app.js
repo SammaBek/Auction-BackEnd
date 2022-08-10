@@ -19,7 +19,7 @@ const httpServer = createServer(app);
 console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: ["*"],
   },
 });
 
