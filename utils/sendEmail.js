@@ -11,7 +11,7 @@ module.exports = class Email {
   }
   newTransport() {
     if (process.env.NODE_ENV === "production") {
-      console.log("production Baby");
+      console.log("we are in production");
       console.log(process.env);
       return nodemailer.createTransport({
         service: "SendGrid",
