@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const HttepError = require("../models/http-error");
 const jwt = require("jsonwebtoken");
 const express = require("express");

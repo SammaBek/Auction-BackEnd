@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const HttepError = require("../models/http-error");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const User = require("../models/users");
 const SendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
