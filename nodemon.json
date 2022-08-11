@@ -4,7 +4,7 @@
     "DB_PASSWORD": "SammaBek2021",
     "DB_NAME": "MealApp",
     "EMAIL_FROM": "sammabek2020@gmail.com",
-    "NODE_ENV": "development",
+    "NODE_ENV": "production",
     "EMAIL_HOST": "smtp.mailtrap.io",
     "EMAIL_PORT": 2525,
     "EMAIL_USERNAME": "203d9133675237",
