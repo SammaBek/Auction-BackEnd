@@ -20,6 +20,8 @@ console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
   cors: {
     origin: ["*"],
+    methods: ["GET", "POST", "PATCH"],
+    credentials: true,
   },
 });
 
