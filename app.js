@@ -19,7 +19,7 @@ const httpServer = createServer(app);
 console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
   cors: {
-    origin: ["*"],
+    origin: ["http://localhost:3000/"],
     methods: ["GET", "POST", "PATCH"],
     credentials: true,
   },
@@ -29,7 +29,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000/");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
     "Access-Control-Allow-Headers",
