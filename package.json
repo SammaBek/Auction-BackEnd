@@ -12,6 +12,7 @@
   "author": "Samuel Bekele",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.1194.0",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.1",
     "bson": "^4.6.5",

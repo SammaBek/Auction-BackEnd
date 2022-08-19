@@ -8,6 +8,14 @@ const User = require("../models/users");
 const { findById } = require("../models/users");
 const Email = require("../utils/sendEmail");
 const Chats = require("../models/Chats");
+const S3 = require("aws-sdk/clients/s3");
+const fs = require("fs");
+
+const s3 = new S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_BUCKET_REGION,
+});
 
 const createUser = async (req, res, next) => {
   const { userName, password, email, passwordChangedAt, role, phone } =
@@ -28,7 +36,13 @@ const createUser = async (req, res, next) => {
   if (!error.isEmpty()) {
     return next(new HttepError("Invalid inputs passed", 400));
   }
-
+  const fileStream = fs.createReadStream(req.file.path);
+  const uploadParams = {
+    Bucket: process.env.S3_BUCKET_NAME,
+    key: req.file.filename,
+    Body: fileStream,
+  };
+  // console.log(req.file);
   const newUser = await User.create({
     userName,
     password,
@@ -38,7 +52,7 @@ const createUser = async (req, res, next) => {
     image: req.file.path,
     createdAt: Date.now(),
   });
-
+  await s3.upload(uploadParams).promise();
   let token;
   try {
     token = jwt.sign(
