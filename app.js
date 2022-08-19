@@ -25,6 +25,7 @@ const io = new Server(httpServer, {
     credentials: true,
   },
 });
+start(io);
 app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -39,8 +40,6 @@ app.use("/uploads/images", express.static(path.join("uploads", "images")));
 //   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
 //   next();
 // });
-
-start(io);
 
 app.use("/api/meals", mealsRoutes);
 app.use("/api/users", userRoutes);
