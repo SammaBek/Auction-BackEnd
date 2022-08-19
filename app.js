@@ -20,7 +20,7 @@ const httpServer = createServer(app);
 console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
   cors: {
-    origin: ["*"],
+    origin: "*",
     methods: ["GET", "POST", "PATCH"],
     credentials: true,
   },
