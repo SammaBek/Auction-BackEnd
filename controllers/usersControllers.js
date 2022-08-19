@@ -52,7 +52,8 @@ const createUser = async (req, res, next) => {
     image: req.file.path,
     createdAt: Date.now(),
   });
-  await s3.upload(uploadParams).promise();
+  const result = await s3.upload(uploadParams).promise();
+  console.log(result);
   let token;
   try {
     token = jwt.sign(
