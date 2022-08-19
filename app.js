@@ -10,6 +10,7 @@ const userRoutes = require("./routes/users-routes");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const { start } = require("./utils/socket");
+const cors = require("cors");
 
 // const dotenv = require("dotenv");
 // dotenv.config({ path: "./config.env" });
@@ -19,17 +20,17 @@ const httpServer = createServer(app);
 console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:3000/"],
+    origin: ["*"],
     methods: ["GET", "POST", "PATCH"],
     credentials: true,
   },
 });
-
+app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000/");
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
     "Access-Control-Allow-Headers",
