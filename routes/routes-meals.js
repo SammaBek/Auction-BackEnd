@@ -3,7 +3,7 @@ const HttepError = require("../models/http-error");
 const mealControllers = require("../controllers/placesControllers");
 const Auth = require("../auth/AuthController");
 const { check } = require("express-validator");
-const fileUpload = require("../utils/fileUpload");
+const uploadS3 = require("../utils/fileUpload");
 
 const router = express.Router();
 
@@ -25,7 +25,7 @@ router.get("/getnotification/:id", Auth.protect, mealControllers.getNotf);
 router.post(
   "/addproduct",
   Auth.protect,
-  fileUpload.single("image"),
+  uploadS3.single("image"),
   check("name").not().isEmpty(),
   mealControllers.createMeal
 );

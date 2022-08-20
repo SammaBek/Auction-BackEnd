@@ -2,7 +2,7 @@ const express = require("express");
 const userControllers = require("../controllers/usersControllers");
 const Auth = require("../auth/AuthController");
 const { check } = require("express-validator");
-const fileUpload = require("../utils/fileUpload");
+const uploadS3 = require("../utils/fileUpload");
 const productController = require("../controllers/placesControllers");
 
 const router = express.Router();
@@ -11,7 +11,7 @@ router.get("/:pid", Auth.protect, userControllers.getUser);
 
 router.post(
   "/signup",
-  fileUpload.single("image"),
+  uploadS3.single("image"),
   check("email").not().isEmpty(),
   check("password").isLength({ min: 5, max: 10 }),
   userControllers.createUser
