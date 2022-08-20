@@ -12,8 +12,11 @@ const MIME_TYPE_MAP = {
 };
 
 const s3 = new aws.S3({
-  accessKeyId: "AKIART7JBNOJTAF6PZBN",
-  secretAccessKey: "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",
+  credentials: {
+    accessKeyId: "AKIART7JBNOJTAF6PZBN",
+    secretAccessKey: "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",
+  },
+  region: "US East (N. Virginia) us-east-1",
 });
 // const fileUpload = multer({
 //   limits: 500000,
