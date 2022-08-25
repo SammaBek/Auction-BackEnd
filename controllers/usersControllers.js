@@ -71,8 +71,8 @@ const createUser = async (req, res, next) => {
       { expiresIn: "1h" }
     );
   } catch {}
-  // const url = `${req.protocol}://${req.get("host")}`;
-  // await new Email(newUser, url).sendWelcome();
+  const url = `${req.protocol}://${req.get("host")}`;
+  await new Email(newUser, url).sendWelcome();
 
   newUser.password = undefined;
 
