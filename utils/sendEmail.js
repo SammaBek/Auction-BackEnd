@@ -50,7 +50,7 @@ module.exports = class Email {
   }
 
   async sendWelcome() {
-    await this.send("welcomeEMail", "Welcome to Gabaa Auction");
+    await this.send("welcomeEmail", "Welcome to Gabaa Auction");
   }
 
   async SendPassForget() {
