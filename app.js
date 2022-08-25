@@ -22,7 +22,7 @@ app.use(cors());
 console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://gabaa-ecom.web.app",
+    origin: "*",
     methods: ["GET", "POST", "PATCH"],
     credentials: true,
   },
@@ -31,16 +31,16 @@ const io = new Server(httpServer, {
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With,Content-Type,Accept,Authorization"
-  );
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   res.setHeader("Access-Control-Allow-Credentials", "true");
+//   res.setHeader(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested-With,Content-Type,Accept,Authorization"
+//   );
+//   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
+//   next();
+// });
 
 app.use("/api/meals", mealsRoutes);
 app.use("/api/users", userRoutes);
