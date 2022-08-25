@@ -21,7 +21,7 @@ const httpServer = createServer(app);
 console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
+    origin: "https://gabaa-ecom.web.app",
     methods: ["GET", "POST", "PATCH"],
     credentials: true,
   },
