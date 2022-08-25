@@ -17,6 +17,7 @@ const cors = require("cors");
 
 const app = express();
 const httpServer = createServer(app);
+app.use(cors());
 
 console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
@@ -27,7 +28,6 @@ const io = new Server(httpServer, {
   },
 });
 
-app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use("/uploads/images", express.static(path.join("uploads", "images")));
