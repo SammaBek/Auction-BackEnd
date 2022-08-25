@@ -14,6 +14,7 @@ const cors = require("cors");
 
 // const dotenv = require("dotenv");
 // dotenv.config({ path: "./config.env" });
+
 const app = express();
 const httpServer = createServer(app);
 
@@ -25,7 +26,7 @@ const io = new Server(httpServer, {
     credentials: true,
   },
 });
-start(io);
+
 app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.json());
@@ -47,6 +48,8 @@ app.use("/api/users", userRoutes);
 app.use((req, res, next) => {
   return next(new HttepError("Couldnt find the route", 404));
 });
+
+start(io);
 
 app.use((error, req, res, next) => {
   if (req.file) {

@@ -8,13 +8,29 @@ const User = require("../models/users");
 const { findById } = require("../models/users");
 const Email = require("../utils/sendEmail");
 const Chats = require("../models/Chats");
-const S3 = require("aws-sdk/clients/s3");
+const aws = require("aws-sdk");
 const fs = require("fs");
 
-// const s3 = new S3({
-//   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-//   region: process.env.AWS_BUCKET_REGION,
+const MIME_TYPE_MAP = {
+  "image/png": "png",
+  "image/jpeg": "jpeg",
+  "image/jpg": "jpg",
+  "image/webp": "webp",
+};
+
+aws.config.setPromisesDependency();
+aws.config.update({
+  accessKeyId: "AKIART7JBNOJTAF6PZBN",
+  secretAccessKey: "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",
+  region: "us-east-1",
+});
+const s3 = new aws.S3();
+// const s3 = new aws({
+//   credentials: {
+//     accessKeyId: "AKIART7JBNOJTAF6PZBN",
+//     secretAccessKey: "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",
+//   },
+//   region: "US East (N. Virginia) us-east-1",
 // });
 
 const createUser = async (req, res, next) => {
@@ -36,13 +52,7 @@ const createUser = async (req, res, next) => {
   if (!error.isEmpty()) {
     return next(new HttepError("Invalid inputs passed", 400));
   }
-  // const fileStream = fs.createReadStream(req.file.path);
-  // const uploadParams = {
-  //   Bucket: process.env.S3_BUCKET_NAME,
-  //   key: req.file.filename,
-  //   Body: fileStream,
-  // };
-  // console.log(req.file);
+
   const newUser = await User.create({
     userName,
     password,
@@ -66,8 +76,29 @@ const createUser = async (req, res, next) => {
 
   newUser.password = undefined;
 
-  // const result = await s3.upload(uploadParams).promise();
+  console.log(`Req FILE: ${req.file.filename}`);
+
+  const ext = MIME_TYPE_MAP[req.file.mimetype];
+
+  const uploadParams = {
+    Bucket: "gabaa-app-resource",
+    Key: req.file.filename,
+    Body: fs.createReadStream(req.file.path),
+    ACL: "public-read",
+  };
+
+  // const command = new putObjectCommand(uploadParams);
+  // const result = await s3.send(command).promise();
   // console.log(result);
+
+  s3.upload(uploadParams, (err, data) => {
+    if (err) {
+      console.log(`error while uploading:${err}`);
+      if (data) {
+        console.log(`this is data from s3: ${data}`);
+      }
+    }
+  });
 
   res.status(201).json({ token: token, theUser: newUser });
 };
