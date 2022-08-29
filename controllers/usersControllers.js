@@ -59,7 +59,7 @@ const createUser = async (req, res, next) => {
     email,
     phone,
     role,
-    image: req.file.path,
+    image: req.file.filename,
     createdAt: Date.now(),
   });
 
