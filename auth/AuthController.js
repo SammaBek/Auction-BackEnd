@@ -89,7 +89,7 @@ exports.forgotPassword = async (req, res, next) => {
 
   //3) send the generated token to the email address
 
-  const ResetURL = `${req.protocol}://https://gabaa-ecom.web.app/newpassword/${randomToken}`;
+  const ResetURL = `https://gabaa-ecom.web.app/newpassword/${randomToken}`;
 
   try {
     await new Email(theUser, ResetURL).SendPassForget();
