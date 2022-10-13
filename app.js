@@ -25,6 +25,10 @@ const io = new Server(httpServer, {
     origin: ["*"],
     methods: ["GET", "POST", "PATCH"],
     credentials: true,
+    allowedHeaders: [
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With,Content-Type,Accept,Authorization",
+    ],
   },
 });
 
