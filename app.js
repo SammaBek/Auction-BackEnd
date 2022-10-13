@@ -17,18 +17,14 @@ const cors = require("cors");
 
 const app = express();
 const httpServer = createServer(app);
-app.use(cors());
+app.use(cors({ origin: "*" }));
 
 console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
   cors: {
-    origin: ["*"],
+    origin: "*",
     methods: ["GET", "POST", "PATCH"],
     credentials: true,
-    allowedHeaders: [
-      "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With,Content-Type,Accept,Authorization",
-    ],
   },
 });
 
