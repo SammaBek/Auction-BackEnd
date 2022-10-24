@@ -34,7 +34,7 @@ const s3 = new aws.S3();
 // });
 
 const createUser = async (req, res, next) => {
-  const { userName, password, email, passwordChangedAt, role, phone } =
+  const { userName, password, email, passwordChangedAt, role, phone, address } =
     req.body;
   let existingUser;
   try {
@@ -59,6 +59,7 @@ const createUser = async (req, res, next) => {
     email,
     phone,
     role,
+    address,
     image: req.file.filename,
     createdAt: Date.now(),
   });
@@ -397,12 +398,15 @@ const getChats = async (req, res, next) => {
   arr.reverse();
   let count = 0;
   console.log(req.body.number);
+  console.log(arr);
   if (req.body.number === 0) {
     console.log(arr[0]);
     arr.map((ch) => {
-      if (ch.seen === false) {
-        console.log("Count");
-        count++;
+      if (ch) {
+        if (ch.seen === false) {
+          console.log("Count");
+          count++;
+        }
       }
     });
     res.status(200).json({ num: count });

@@ -22,6 +22,7 @@ const userSchema = new Schema(
     passwordResetExpires: Date,
     createdAt: { type: Date },
     phone: { type: Number },
+    address: { type: String },
     active: {
       type: Boolean,
       default: true,
