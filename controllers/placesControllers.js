@@ -7,6 +7,23 @@ const { newBid, newNotification } = require("../utils/socket");
 const Notification = require("../models/Notifications");
 const { match } = require("assert");
 const Users = require("../models/users");
+const aws = require("aws-sdk");
+const fs = require("fs");
+
+const MIME_TYPE_MAP = {
+  "image/png": "png",
+  "image/jpeg": "jpeg",
+  "image/jpg": "jpg",
+  "image/webp": "webp",
+};
+
+aws.config.setPromisesDependency();
+aws.config.update({
+  accessKeyId: "AKIART7JBNOJTAF6PZBN",
+  secretAccessKey: "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",
+  region: "us-east-1",
+});
+const s3 = new aws.S3();
 
 const getMealById = async (req, res, next) => {
   const id = req.params.id;
@@ -148,7 +165,7 @@ const createMeal = async (req, res, next) => {
   if (!error.isEmpty()) {
     return next(new HttepError("Invalid inputs passed", 400));
   }
-  console.log(req.user._id);
+  // console.log(req.user._id);
   const {
     price,
     name,
@@ -159,7 +176,16 @@ const createMeal = async (req, res, next) => {
 
     ...specs
   } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
+  console.log(req.files);
+
+  let images = [];
+
+  if (req.files.length > 0) {
+    for (let i = 0; i < req.files.length; i++) {
+      images.push(req.files[i].filename);
+    }
+  }
   const newMeal = new Meals({
     name,
     price,
@@ -168,7 +194,7 @@ const createMeal = async (req, res, next) => {
     productCatagory,
     status,
 
-    image: req.file.path,
+    image: images,
     owner: req.user._id,
     createdAt: Date.now(),
     specs,
@@ -181,6 +207,24 @@ const createMeal = async (req, res, next) => {
   } catch {
     return next(new HttepError("couldnt save the meal to Data Base", 500));
   }
+
+  req.files.forEach((file) => {
+    const uploadParams = {
+      Bucket: "gabaa-app-resource",
+      Key: file.filename,
+      Body: fs.createReadStream(file.path),
+      ACL: "public-read",
+    };
+
+    s3.upload(uploadParams, (err, data) => {
+      if (err) {
+        console.log(`error while uploading:${err}`);
+        if (data) {
+          console.log(`this is data from s3: ${data}`);
+        }
+      }
+    });
+  });
 
   res.status(201);
   res.json({ places: newMeal });

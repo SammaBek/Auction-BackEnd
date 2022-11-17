@@ -19,10 +19,11 @@ router.post(
 );
 
 router.post("/login", userControllers.loginUser);
-router.post("/getChats", userControllers.getChats);
+router.post("/getChats", Auth.protect, userControllers.getChats);
 router.post("/getChat", Auth.protect, userControllers.getMessage);
 router.patch("/forgotPassword", Auth.forgotPassword);
 router.patch("/resetPassword/:token", Auth.resetPassword);
+router.post("/checkSignIn", Auth.protect);
 router.patch("/updatePassword", Auth.protect, Auth.updatePassword);
 router.patch("/updateData", Auth.protect, userControllers.updateData);
 router.post("/sendMessage", Auth.protect, userControllers.sendMessage);

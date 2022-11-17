@@ -25,7 +25,7 @@ const MealSchema = new Schema(
       ],
     },
     createdAt: { type: Date },
-    image: String,
+    image: [{ type: String }],
     owner: {
       type: mongoose.Schema.ObjectId,
       ref: "User",

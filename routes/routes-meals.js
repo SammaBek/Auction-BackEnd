@@ -26,7 +26,7 @@ router.get("/getnotification/:id", Auth.protect, mealControllers.getNotf);
 router.post(
   "/addproduct",
   Auth.protect,
-  upload.single("image"),
+  upload.array("images"),
   check("name").not().isEmpty(),
   mealControllers.createMeal
 );

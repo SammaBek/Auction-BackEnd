@@ -212,7 +212,7 @@ const updateData = async (req, res, next) => {
   let theUser, token;
   const Data = req.body;
   console.log("this", Data);
-  const filter = ["email", "userName"];
+  const filter = ["userName", "phone", "address"];
   const newObj = {};
   theUser = await User.findById(req.user.id);
 
