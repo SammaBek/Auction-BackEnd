@@ -17,17 +17,26 @@ const cors = require("cors");
 
 const app = express();
 const httpServer = createServer(app);
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
   cors: {
-    origin: ["*"],
+    origin: "*",
     methods: ["GET", "POST", "PATCH"],
 
     credentials: true,
   },
 });
+
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use("/uploads/images", express.static(path.join("uploads", "images")));
+
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -38,9 +47,6 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
   next();
 });
-app.use(cookieParser());
-app.use(bodyParser.json());
-app.use("/uploads/images", express.static(path.join("uploads", "images")));
 
 app.use("/api/meals", mealsRoutes);
 app.use("/api/users", userRoutes);
