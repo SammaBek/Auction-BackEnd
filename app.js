@@ -17,12 +17,12 @@ const cors = require("cors");
 
 const app = express();
 const httpServer = createServer(app);
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "PUT", "DELETE", "HEAD", "POST", "PATCH"],
-  })
-);
+// app.use(
+//   cors({
+//     origin: "*",
+//     methods: ["GET", "PUT", "DELETE", "HEAD", "POST", "PATCH"],
+//   })
+// );
 
 console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
