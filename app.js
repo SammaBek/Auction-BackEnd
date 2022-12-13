@@ -24,7 +24,9 @@ app.use(
 );
 
 console.log(process.env.EMAIL_FROM);
-const io = new Server(httpServer, { cors: { origin: "*" } });
+const io = new Server(httpServer, {
+  cors: { origin: "*", allowedHeaders: "*" },
+});
 
 app.use(cookieParser());
 app.use(bodyParser.json());
