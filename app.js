@@ -17,16 +17,18 @@ const cors = require("cors");
 
 const app = express();
 const httpServer = createServer(app);
+
 app.use(
   cors({
     origin: "*",
   })
 );
 
-console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
-  cors: { origin: "*", allowedHeaders: "*" },
+  cors: { origin: "*", methods: ["GET", "POST"] },
 });
+
+console.log(process.env.EMAIL_FROM);
 
 app.use(cookieParser());
 app.use(bodyParser.json());
