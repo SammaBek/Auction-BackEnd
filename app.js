@@ -24,11 +24,7 @@ app.use(
 );
 
 console.log(process.env.EMAIL_FROM);
-const io = new Server(httpServer, {
-  cors: {
-    origin: ["http://localhost:8000", "https://gabaa-ecom.web.app"],
-  },
-});
+const io = new Server(httpServer, { cors: { origin: "*" } });
 
 app.use(cookieParser());
 app.use(bodyParser.json());
