@@ -26,7 +26,7 @@ app.use(
 console.log(process.env.EMAIL_FROM);
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:8000", "https://gabaa.herokuapp.com"],
+    origin: ["http://localhost:8000", "https://gabaa-ecom.web.app"],
   },
 });
 
