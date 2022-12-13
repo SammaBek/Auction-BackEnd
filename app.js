@@ -24,7 +24,11 @@ app.use(
 );
 
 console.log(process.env.EMAIL_FROM);
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    origin: ["http://localhost:8000", "https://gabaa.herokuapp.com"],
+  },
+});
 
 app.use(cookieParser());
 app.use(bodyParser.json());
