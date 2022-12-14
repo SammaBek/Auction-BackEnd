@@ -20,8 +20,8 @@ const MIME_TYPE_MAP = {
 
 aws.config.setPromisesDependency();
 aws.config.update({
-  accessKeyId: "AKIART7JBNOJTAF6PZBN",
-  secretAccessKey: "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",
+  accessKeyId: AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: "us-east-1",
 });
 const s3 = new aws.S3();
