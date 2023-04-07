@@ -4,6 +4,7 @@ const { v4: uuid } = require("uuid");
 const HttepError = require("../models/http-error");
 const aws = require("aws-sdk");
 const fs = require("fs");
+const sharp = require("sharp");
 
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage: storage });
@@ -30,17 +31,25 @@ const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, "uploads/images");
-    },
-    filename: (req, file, cb) => {
-      const ext = MIME_TYPE_MAP[file.mimetype];
+      console.log("Multer");
       console.log(file);
+    },
+    filename: async (req, file, cb) => {
+      const ext = MIME_TYPE_MAP[file.mimetype];
+      // console.log(` this is from multer${file}`);
+      console.log("Multer1");
+      console.log(file);
+
       cb(null, uuid() + "." + ext);
     },
   }),
   fileFilter: async (req, file, cb) => {
     const isValid = !!MIME_TYPE_MAP[file.mimetype];
     const error = isValid ? null : new HttepError("Invalid Mime type", 400);
-    // console.log(`this is: ${req.file}`);
+    console.log("Multer2");
+    console.log(file);
+
+    // console.log(`this is Also from Multer: ${file}`);
     // const uploadParams = {
     //   Bucket: "gabaa-app-resource",
     //   Body: file.buffer,

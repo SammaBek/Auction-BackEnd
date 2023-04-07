@@ -9,6 +9,7 @@ const { match } = require("assert");
 const Users = require("../models/users");
 const aws = require("aws-sdk");
 const fs = require("fs");
+const sharp = require("sharp");
 
 const MIME_TYPE_MAP = {
   "image/png": "png",
@@ -21,6 +22,7 @@ aws.config.setPromisesDependency();
 aws.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+
   region: "us-east-1",
 });
 const s3 = new aws.S3();
@@ -165,7 +167,7 @@ const createMeal = async (req, res, next) => {
   if (!error.isEmpty()) {
     return next(new HttepError("Invalid inputs passed", 400));
   }
-  // console.log(req.user._id);
+  console.log("hello");
   const {
     price,
     name,
@@ -177,14 +179,30 @@ const createMeal = async (req, res, next) => {
     ...specs
   } = req.body;
   // console.log(req.body);
-  console.log(req.files);
+  // console.log(req.files);
 
   let images = [];
 
   if (req.files.length > 0) {
     for (let i = 0; i < req.files.length; i++) {
-      images.push(req.files[i].filename);
+      // console.log(req.files[i]);
+      const index = req.files[i].filename.indexOf(".");
+      const fileName = req.files[i].filename.slice(0, index);
+      images.push(`${fileName}.webp`);
+
+      const pic = await sharp(req.files[i].path).toFile(
+        `uploads/images/${fileName}.webp`
+      );
+
+      console.log(pic);
+      req.files[i].path = `uploads/images/${fileName}.webp`;
+      req.files[i].filename = `${fileName}.webp`;
+      // req.files[i].mimetype = "image/webp";
+      // console.log("HHHHHH");
+      // console.log(req.files[i]);
     }
+
+    console.log(images);
   }
   const newMeal = new Meals({
     name,

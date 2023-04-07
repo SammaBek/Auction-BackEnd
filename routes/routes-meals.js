@@ -11,12 +11,12 @@ const router = express.Router();
 router.get("/", mealControllers.getMeal);
 router.get(
   "/getByName/:search",
-  Auth.protect,
+
   mealControllers.getProductByName
 );
 
 router.get("/filterProducts/", mealControllers.filterProduct);
-router.get("/:id", Auth.protect, mealControllers.getMealById);
+router.get("/:id", mealControllers.getMealById);
 
 router.get("/myproducts/:id", mealControllers.getMealByUserId);
 router.post("/makebid", Auth.protect, mealControllers.makeBid);
