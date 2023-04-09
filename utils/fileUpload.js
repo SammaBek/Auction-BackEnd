@@ -31,8 +31,8 @@ const upload = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, "uploads/images");
-      console.log("Multer");
-      console.log(file);
+      // console.log("Multer");
+      // console.log(file);
     },
     filename: async (req, file, cb) => {
       const ext = MIME_TYPE_MAP[file.mimetype];

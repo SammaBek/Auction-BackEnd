@@ -188,15 +188,15 @@ const createMeal = async (req, res, next) => {
       // console.log(req.files[i]);
       const index = req.files[i].filename.indexOf(".");
       const fileName = req.files[i].filename.slice(0, index);
-      images.push(`${fileName}.webp`);
+      images.push(`W-${fileName}.webp`);
 
       const pic = await sharp(req.files[i].path).toFile(
-        `uploads/images/${fileName}.webp`
+        `uploads/images/W-${fileName}.webp`
       );
 
       console.log(pic);
       req.files[i].path = `uploads/images/${fileName}.webp`;
-      req.files[i].filename = `${fileName}.webp`;
+      req.files[i].filename = `W-${fileName}.webp`;
       // req.files[i].mimetype = "image/webp";
       // console.log("HHHHHH");
       // console.log(req.files[i]);
