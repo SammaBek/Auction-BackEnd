@@ -195,7 +195,7 @@ const createMeal = async (req, res, next) => {
       );
 
       console.log(pic);
-      req.files[i].path = `uploads/images/${fileName}.webp`;
+      req.files[i].path = `uploads/images/W-${fileName}.webp`;
       req.files[i].filename = `W-${fileName}.webp`;
       // req.files[i].mimetype = "image/webp";
       // console.log("HHHHHH");
