@@ -10,6 +10,7 @@ const Users = require("../models/users");
 const aws = require("aws-sdk");
 const fs = require("fs");
 const sharp = require("sharp");
+const { v4: uuid } = require("uuid");
 
 const MIME_TYPE_MAP = {
   "image/png": "png",
@@ -178,28 +179,29 @@ const createMeal = async (req, res, next) => {
 
     ...specs
   } = req.body;
-  // console.log(req.body);
-  // console.log(req.files);
+  console.log(req.body);
+  console.log(req.files);
+
+  // const pic = await sharp(req.files[0].buffer).toFile(
+  //   `uploads/images/W-${uuid()}.webp`
+  // );
 
   let images = [];
 
   if (req.files.length > 0) {
     for (let i = 0; i < req.files.length; i++) {
       // console.log(req.files[i]);
-      const index = req.files[i].filename.indexOf(".");
-      const fileName = req.files[i].filename.slice(0, index);
-      images.push(`W-${fileName}.webp`);
+      // const index = req.files[i].filename.indexOf(".");
+      const fileName = `I-${uuid()}.webp`;
+      images.push(fileName);
 
-      const pic = await sharp(req.files[i].path).toFile(
-        `uploads/images/W-${fileName}.webp`
+      const pic = await sharp(req.files[i].buffer).toFile(
+        `uploads/images/${fileName}`
       );
 
       console.log(pic);
-      req.files[i].path = `uploads/images/W-${fileName}.webp`;
-      req.files[i].filename = `W-${fileName}.webp`;
-      // req.files[i].mimetype = "image/webp";
-      // console.log("HHHHHH");
-      // console.log(req.files[i]);
+      // req.files[i].path = `uploads/images/W-${fileName}.webp`;
+      // req.files[i].filename = `W-${fileName}.webp`;
     }
 
     console.log(images);
@@ -226,11 +228,11 @@ const createMeal = async (req, res, next) => {
     return next(new HttepError("couldnt save the meal to Data Base", 500));
   }
 
-  req.files.forEach((file) => {
+  images.forEach((name) => {
     const uploadParams = {
       Bucket: "gabaa-app-resource",
-      Key: file.filename,
-      Body: fs.createReadStream(file.path),
+      Key: name,
+      Body: fs.createReadStream(`uploads/images/${name}`),
       ACL: "public-read",
     };
 

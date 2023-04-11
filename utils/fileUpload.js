@@ -18,65 +18,44 @@ const MIME_TYPE_MAP = {
   "image/webp": "webp",
 };
 
-// const s3 = new aws.S3({
-//   credentials: {
-//     accessKeyId: "AKIART7JBNOJTAF6PZBN",
-//     secretAccessKey: "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",
-//   },
-//   region: "US East (N. Virginia) us-east-1",
-// });
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-const upload = multer({
-  limits: 500000,
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, "uploads/images");
-      // console.log("Multer");
-      // console.log(file);
-    },
-    filename: async (req, file, cb) => {
-      const ext = MIME_TYPE_MAP[file.mimetype];
-      // console.log(` this is from multer${file}`);
-      console.log("Multer1");
-      console.log(file);
-
-      cb(null, uuid() + "." + ext);
-    },
-  }),
-  fileFilter: async (req, file, cb) => {
-    const isValid = !!MIME_TYPE_MAP[file.mimetype];
-    const error = isValid ? null : new HttepError("Invalid Mime type", 400);
-    console.log("Multer2");
-    console.log(file);
-
-    // console.log(`this is Also from Multer: ${file}`);
-    // const uploadParams = {
-    //   Bucket: "gabaa-app-resource",
-    //   Body: file.buffer,
-    //   Key: file.filename,
-    // };
-
-    // const result = await s3.upload(uploadParams).promise();
-    // console.log(result);
-
-    cb(error, isValid);
-  },
-});
-
-// const uploadS3 = multer({
-//   storage: multerS3({
-//     s3: s3,
-//     bucket: "gabaa-app-resource",
-//     acl: "public-read",
-//     metadata: function (req, file, cb) {
-//       cb(null, { fieldName: file.fieldname });
-//       console.log(file.fieldname);
+// const upload = multer({
+//   limits: 500000,
+//   storage: multer.diskStorage({
+//     destination: (req, file, cb) => {
+//       cb(null, "uploads/images");
+//       // console.log("Multer");
+//       // console.log(file);
 //     },
-//     key: function (req, file, cb) {
-//       cb(null, Date.now().toString());
+//     filename: async (req, file, cb) => {
+//       const ext = MIME_TYPE_MAP[file.mimetype];
+//       // console.log(` this is from multer${file}`);
+//       console.log("Multer1");
+//       console.log(file);
+
+//       cb(null, uuid() + "." + ext);
 //     },
 //   }),
+//   fileFilter: async (req, file, cb) => {
+//     const isValid = !!MIME_TYPE_MAP[file.mimetype];
+//     const error = isValid ? null : new HttepError("Invalid Mime type", 400);
+//     console.log("Multer2");
+//     console.log(file);
+
+//     // console.log(`this is Also from Multer: ${file}`);
+//     // const uploadParams = {
+//     //   Bucket: "gabaa-app-resource",
+//     //   Body: file.buffer,
+//     //   Key: file.filename,
+//     // };
+
+//     // const result = await s3.upload(uploadParams).promise();
+//     // console.log(result);
+
+//     cb(error, isValid);
+//   },
 // });
 
-// module.exports = fileUpload;
 module.exports = upload;
