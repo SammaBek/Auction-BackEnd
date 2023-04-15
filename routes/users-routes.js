@@ -14,7 +14,7 @@ router.post(
   "/signup",
   upload.single("image"),
   check("email").not().isEmpty(),
-  check("password").isLength({ min: 5, max: 10 }),
+  check("password").isLength({ min: 5, max: 20 }),
   userControllers.createUser
 );
 

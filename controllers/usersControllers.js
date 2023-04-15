@@ -10,6 +10,8 @@ const Email = require("../utils/sendEmail");
 const Chats = require("../models/Chats");
 const aws = require("aws-sdk");
 const fs = require("fs");
+const { v4: uuid } = require("uuid");
+const sharp = require("sharp");
 
 const MIME_TYPE_MAP = {
   "image/png": "png",
@@ -34,8 +36,10 @@ const s3 = new aws.S3();
 // });
 
 const createUser = async (req, res, next) => {
+  console.log("In Create User");
   const { userName, password, email, passwordChangedAt, role, phone, address } =
     req.body;
+
   let existingUser;
   try {
     existingUser = await User.findOne({ email: email });
@@ -53,6 +57,16 @@ const createUser = async (req, res, next) => {
     return next(new HttepError("Invalid inputs passed", 400));
   }
 
+  console.log(req.file);
+  // const index = req.files[i].filename.indexOf(".");
+  const fileName = `I-${uuid()}.webp`;
+
+  const pic = await sharp(req.file.buffer).toFile(`uploads/images/${fileName}`);
+
+  console.log(pic);
+  // req.files[i].path = `uploads/images/W-${fileName}.webp`;
+  // req.files[i].filename = `W-${fileName}.webp`;
+
   const newUser = await User.create({
     userName,
     password,
@@ -60,7 +74,7 @@ const createUser = async (req, res, next) => {
     phone,
     role,
     address,
-    image: req.file.filename,
+    image: fileName,
     createdAt: Date.now(),
   });
 
@@ -77,14 +91,10 @@ const createUser = async (req, res, next) => {
 
   newUser.password = undefined;
 
-  console.log(`Req FILE: ${req.file.filename}`);
-
-  const ext = MIME_TYPE_MAP[req.file.mimetype];
-
   const uploadParams = {
     Bucket: "gabaa-app-resource",
-    Key: req.file.filename,
-    Body: fs.createReadStream(req.file.path),
+    Key: fileName,
+    Body: fs.createReadStream(`uploads/images/${fileName}`),
     ACL: "public-read",
   };
 
